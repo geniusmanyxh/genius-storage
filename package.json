@@ -6,12 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://your-package.org",
-  "bugs": "https://github.com/xxx/shang-utils/issues",
+  "homepage": "https://github.com/geniusmanyxh/genius-storage",
+  "bugs": "https://github.com/geniusmanyxh/genius-storage/issues",
   "keywords": ["localStorage","sessionStorage","cookie","utils"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/xxx/shang-utils"
+    "url": "https://github.com/geniusmanyxh/genius-storage"
   },
   "author": "geniusman",
   "license": "ISC"
