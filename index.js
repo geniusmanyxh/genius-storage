@@ -1,3 +1,3 @@
-import { GStorage } from "./GStorage";
+import { GStorage } from './GStorage.js'
 
-export {GStorage}
+export { GStorage }
