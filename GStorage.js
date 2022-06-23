@@ -953,7 +953,8 @@
    */
   function TypeInstance(type, options) {
     if (type && typeof type === 'string' && type.trim()) {
-      options.instanceType = type
+      // options.instanceType = type
+      let optObj = {...options,instanceType:type}
 
       let _tflag =
         type === 'local'
@@ -964,7 +965,7 @@
           ? true
           : false
       if (_tflag) {
-        return new ComStorage(options)
+        return new ComStorage(optObj)
       } else {
         ErrorTips(
           'err',
