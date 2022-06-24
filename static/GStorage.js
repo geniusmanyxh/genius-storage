@@ -59,7 +59,8 @@ const GStorage = (storageType, storageOptions) => {
       attributes = this.assign({}, defaultAttributes, attributes)
 
       if (typeof attributes.expires === 'number') {
-        attributes.expires = new Date(Date.now() + attributes.expires * 864e5)
+        // attributes.expires = new Date(Date.now() + attributes.expires * 864e5)
+        attributes.expires = new Date(attributes.expires)
       }
       if (attributes.expires) {
         attributes.expires = attributes.expires.toUTCString()
@@ -336,8 +337,11 @@ const GStorage = (storageType, storageOptions) => {
       // II 如果传了过期时间，没有传单位，则默认单位ms
 
       // III 判断最终的过期时间是否大于0，如果是则转换为时间戳
+
+      let expires_cookie = {} // 该对象主要用于设置cookie的过期时间
       if (expireTime > 0) {
         expireTime = formatExpireTime(expireTime, typeTime)
+        expires_cookie.expires = expireTime
       }
 
       let getData = this.getFun(key)
@@ -369,13 +373,13 @@ const GStorage = (storageType, storageOptions) => {
       if (getData) {
         if (isReset) {
           // console.log('重新覆盖了旧数据')
-          this._instance && this._instance.setItem(key, JSON.stringify(data))
+          this._instance && this._instance.setItem(key, JSON.stringify(data), expires_cookie)
         } else {
           ErrorTips('warn', '', '此次操作没有覆盖旧数据')
         }
       } else {
         // console.log('写入了新数据')
-        this._instance && this._instance.setItem(key, JSON.stringify(data))
+        this._instance && this._instance.setItem(key, JSON.stringify(data), expires_cookie)
       }
     }
 
