@@ -4,7 +4,10 @@
  * @param {Object} storageOptions 可选配置参数
  * @returns 返回一个可以操作的(LocalStorage | SessionStorage | Cookie)实例对象
  */
-export declare function GStorage(storageType: 'local' | 'session' | 'cookie', storageOptions?: object): ComStorage | undefined
+export declare function GStorage(
+  storageType: 'local' | 'session' | 'cookie',
+  storageOptions?: object
+): ComStorage | undefined
 
 declare class FormatCookie {
   constructor()
@@ -31,7 +34,14 @@ declare class ComStorage {
 
   constructor(args: object | undefined) // 构造函数
 
-  // 存储缓存方法
+  /**
+   * @description 存储缓存方法
+   * @param key 唯一标识
+   * @param value 需要存储的值
+   * @param isReset 是否要重置旧数据
+   * @param expireTime 设置有效时间
+   * @param typeTime 时间单位(默认ms) 
+   */
   setFun(
     key: string,
     value: any,
@@ -39,22 +49,55 @@ declare class ComStorage {
     expireTime?: number | undefined,
     typeTime?: string | undefined
   ): void
-
-  // 获取存储方法
+ 
+  /**
+   * @description 获取存储方法
+   * @param key 唯一标识
+   */
   getFun(key: string): any
 
-  // 删除缓存的方法
+  /**
+   * @description 删除缓存的方法
+   * @param key 唯一标识
+   */
   delFun(key: string): void
 
-  // 判断存储是否存在的方法
+  /**
+   * @description 判断存储是否存在的方法
+   * @param key 唯一标识
+   */
   existFun(key: string): boolean
 
-  // 根据条件筛选浏览器已经存在的所有key值,并组装为一个数组返回
+  /**
+   * @description 根据条件筛选浏览器已经存在的所有在有效期内的key值,并组装为一个数组返回
+   * @param condition 筛选条件
+   */
   allKey(condition?: object): string[]
 
-  // 根据条件删除符合条件的所有缓存数据
+  /**
+   * @description 根据条件删除符合条件的所有缓存数据
+   * @param condition 筛选条件
+   */
   clearFun(condition?: object): void
 }
+
+/**
+ * @description 判断缓存值的过期时间是否已经过期,过期返回true，反之false
+ * @param {Number} expireTime 过期时间参数（应该是一个时间戳）
+ * @returns {boolean} true | false
+ */
+declare function timeIsExpired(expireTime: number | undefined): boolean
+
+/**
+ * @description 根据传进来的key值调用实例的getItem方法获取缓存对象里面的expireTime属性
+ * @param {String} key
+ * @param {ComStorage._instance} instance 缓存操作实例
+ * @returns 返回一个数值类型的过期时间(一般情况 === 时间戳 | -1)
+ */
+declare function getStorageExpireTime(
+  key: string,
+  instance: ComStorage._instance
+): number
 
 /**
  * @description 计算指定符号或者字符，在一串字符串里面重复的次数

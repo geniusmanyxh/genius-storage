@@ -3,14 +3,6 @@
  * @date 2022-06-17
  * @author 天界程序员
  */
-//  let OPTIONS = {
-//   prefix: 'prefix', // key标识的前缀; defaultValue: ''
-//   suffix: 'suffix', // key标识的后缀; defaultValue: ''
-//   linkSign: '.', // key标识的连接符号; defaultValue: '.'  ———— 前缀连接key连接后缀的特殊符号，如 ./@/%/等等
-//   isReset: true, // 默认是强制覆盖原有key对应的值; defaultValue: true         ———— 如果不全局配置中设置，可以在setFun方法里面单独设置是否可以强制覆盖缓存旧数据
-//   expireTime: -1, // 判断只要是0 或者 负数就不设置过期时间; defaultValue: -1   ———— 如果不全局配置中设置，可以在setFun方法里面单独设置过期时间
-//   typeTime: 'ms', // 缓存过期时间的换算单位,默认是毫秒(ms); defaultValue: 'ms' ———— 如果不全局配置中设置，可以在setFun方法里面单独设置其他时间换算单位
-// }
 
 /**
  * @description 根据使用者传入的存储类型以及对应的配置，返回对应存储类型的实例以及方法
@@ -373,13 +365,15 @@ const GStorage = (storageType, storageOptions) => {
       if (getData) {
         if (isReset) {
           // console.log('重新覆盖了旧数据')
-          this._instance && this._instance.setItem(key, JSON.stringify(data), expires_cookie)
+          this._instance &&
+            this._instance.setItem(key, JSON.stringify(data), expires_cookie)
         } else {
           ErrorTips('warn', '', '此次操作没有覆盖旧数据')
         }
       } else {
         // console.log('写入了新数据')
-        this._instance && this._instance.setItem(key, JSON.stringify(data), expires_cookie)
+        this._instance &&
+          this._instance.setItem(key, JSON.stringify(data), expires_cookie)
       }
     }
 
@@ -563,14 +557,31 @@ const GStorage = (storageType, storageOptions) => {
     allKey(options) {
       // console.log(options?.prefix, options?.suffix, options?.linkSign)
       // 获取当前浏览器该类型的缓存的所有key值，组装为一个数组
-      let keyArr = []
+      let keyArr = [] // 存储返回结果的数组
+      let getKeys = [] // 临时存储缓存keys的数组
       // 判断缓存类型
       if (this._instanceType === 'cookie') {
         let keys = Object.keys(this._instance.getItem())
-        keyArr.push(...keys)
+        getKeys.push(...keys)
       } else {
         let keys = Object.keys(this._instance)
-        keyArr.push(...keys)
+        getKeys.push(...keys)
+      }
+
+      // 过滤无效的keys
+      if (getKeys.length > 0) {
+        for (let i = 0; i < getKeys.length; i++) {
+          let val = getKeys[i]
+          // 判断缓存值的过期时间是否已经过期
+          let isTrue = timeIsExpired(getStorageExpireTime(val, this._instance))
+          if (isTrue) {
+            // 如果过期，则继续遍历下一个
+            continue
+          } else {
+            // 如果有效则添加到结果数组中
+            keyArr.push(val)
+          }
+        }
       }
 
       // 判断是否输入了参数 以及key值数组长度是否大于0
@@ -753,7 +764,7 @@ const GStorage = (storageType, storageOptions) => {
               '',
               '我们在您的clearFun方法中获取的配置属性里面并没有监测到{prefix | suffix | linkSign}属性,因为该操作存在风险,我们不做任何删除操作,请您检查并修改后再次进行此操作'
             )
-            return;
+            return
           }
         } else {
           ErrorTips(
@@ -761,7 +772,7 @@ const GStorage = (storageType, storageOptions) => {
             '',
             'clearFun方法中的配置属性应该是一个对象类型(object);因为该操作存在风险,我们不做任何删除操作,建议你修改后再次操作,感谢您的的配合'
           )
-          return;
+          return
         }
       } else {
         // 此时没有传入配置参数,这时我们认为用户是想删除所有该类型的缓存数据,我们直接获取所有该类型的key值数组
@@ -777,8 +788,63 @@ const GStorage = (storageType, storageOptions) => {
           this._instance.removeItem(val)
         })
       }
-      
     }
+  }
+
+  /**
+   * @description 判断缓存值的过期时间是否已经过期,过期返回true，反之false
+   * @param {Number} expireTime 过期时间参数（应该是一个时间戳）
+   * @returns {boolean} true | false
+   */
+  function timeIsExpired(expireTime) {
+    let resFlag = true
+    // 1、判断过期时间是否是一个number类型？
+    // ===> 如果是：在判断是否大于0，如果是进入下一步；反之return false
+    // ===> 如果不是：return false （按理来说应该是一个number类型才对）
+    if (TypeJudgment('number', expireTime) && expireTime > 0) {
+      // 2、在与当前的时间戳进行比较，如果大于当前时间戳，则说明是有效的，反之则无效
+      let current_time = Date.now()
+      if (expireTime > current_time) {
+        resFlag = false
+      } else {
+        resFlag = true
+      }
+    } else {
+      resFlag = false
+    }
+    // console.log('timeIsExpired',resFlag)
+    return resFlag
+  }
+
+  /**
+   * @description 根据传进来的key值调用实例的getItem方法获取缓存对象里面的expireTime属性
+   * @param {String} key
+   * @returns 返回一个数值类型的过期时间(一般情况 === 时间戳 | -1)
+   */
+  function getStorageExpireTime(key, instance) {
+    // 1、使用实例方法获取对应key标识的值
+    let getData = instance.getItem(key)
+    let expireTime = -1
+    console.log(key, getData)
+    // 2、使用JSON.parse() 方法将获取到的值进行转化
+    if (getData) {
+      try {
+        getData = JSON.parse(getData)
+        let t = getData?.expireTime
+        if (TypeJudgment('number', t) && !TypeJudgment('NaN', t)) {
+          // 如果存在过期时间属性，且数据类型合法，则将属性值返回
+          expireTime = t
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    } else {
+      // 如果没有获取到值,我们默认这个值已经过期，被删除了；这时我们返回一个 已经过期的时间戳
+      expireTime = Date.now() - 10000
+      // console.log('getStorageExpireTime', expireTime)
+    }
+    // console.log('getStorageExpireTime',expireTime)
+    return expireTime
   }
 
   /**
@@ -960,7 +1026,7 @@ const GStorage = (storageType, storageOptions) => {
   function TypeInstance(type, options) {
     if (type && typeof type === 'string' && type.trim()) {
       // options.instanceType = type
-      let optObj = {...options,instanceType:type}
+      let optObj = { ...options, instanceType: type }
 
       let _tflag =
         type === 'local'
