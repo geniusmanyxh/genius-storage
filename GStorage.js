@@ -826,7 +826,7 @@
     // 1、使用实例方法获取对应key标识的值
     let getData = instance.getItem(key)
     let expireTime = -1
-    console.log(key, getData)
+    // console.log(key, getData)
     // 2、使用JSON.parse() 方法将获取到的值进行转化
     if (getData) {
       try {
