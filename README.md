@@ -4,6 +4,7 @@ A user-friendly browser cache tool
 [我的个人博客地址](https://www.geniusman.top/)
 
 [CSDN文章地址](http://t.csdn.cn/ODOVj)
+
 [GitHub源码及文档地址](https://github.com/geniusmanyxh/genius-storage)
 
 `genius-storage` 是一个扩展性较好、易上手、统一操作浏览器的 `localStorage` 、`sessionStorage` 、`cookie` 的JavaScript工具库。
@@ -162,7 +163,6 @@ _linkSign: "."				   ===> 前后缀连接符号 (可以改，但是类型必须�
 _prefix: "" 				   ===> 前缀符号 (可以改，但是类型必须是——string)
 _suffix: ""					   ===> 后缀符号 (可以改，但是类型必须是——string)
 _typeTime: "ms"				   ===> 过期时间单位 (可以改，但是类型必须是——string)
-
 ```
 
 修改方式：【实例】【.】【属性】【=】【值】
@@ -207,7 +207,8 @@ gCookie._prefix = "node"
 
 目前实例统一可以调用的方法有：`setFun`  、`getFUn` 、`existFun` 、`delFun` 、`allKey` 、 `clearFun` 6个方法
 
--  setFun (key, value, isReset?, expireTime?, typeTime?)
+#### 3.1、 setFun (key, value, isReset?, expireTime?, typeTime?)
+简要说明：该方法可以存储新的 or 覆盖旧的缓存数据，可以额外设置过期缓存过期时间；无返回值。
 
 ```js
 // 参数类型
@@ -216,6 +217,7 @@ value: any   ===> 必传参数，如果是undefined，会被赋值为空字符�
 isReset: boolean ===> 可选参数，默认为true，代表遇到相同key标识的值时，可以直接覆盖旧数据，false则不覆盖
 expireTime: nummber ===> 可选参数，默认-1，代表不设置过期时间，只有当【expireTime > 0】 时才会设置过期时间
 typeTime: string ===> 可选参数，默认ms，代表过期时间的基本单位，可以设置其他单位来进行时间换算
+
 ```
 
 使用示例：
@@ -231,7 +233,8 @@ gLocal.setFun('key',{value:'666'},true,3, 'm') // 代表设置了一个有效期
 
 
 
-- getFun (key)
+#### 3.2、  getFun (key)
+简要说明：该方法用于获取已经存储的缓存值，如果有效时间过期 or 没有查询到对应的值，则返回`undefined`。
 
 ```js
 // 参数类型
@@ -259,7 +262,8 @@ setTimeout(() => {
 
 
 
-- existFun (key)
+#### 3.3、  existFun (key)
+简要说明：该方法用于判断是否存在一个有效的缓存值，有效返回`true`，反之`false`。
 
 ```js
 // 参数类型
@@ -288,7 +292,8 @@ setTimeout(() => {
 
 
 
-- delFun (key)
+#### 3.4、  delFun (key)
+简要说明：该方法就是用来删除对应`key`唯一标识的缓存值，无返回值。
 
 ```js
 // 参数类型
@@ -296,7 +301,6 @@ key: string  ===> 必传参数
 
 // 1、如果查询到了值，就删除
 // 2、如果没有查询到值，也不会报错
-
 ```
 
 使用示例：
@@ -317,8 +321,8 @@ setTimeout(() => {
 
 
 
-- allKey (conditions?)
-
+#### 3.5、  allKey (conditions?)
+简要说明：该方法就是用来获取浏览器所有在有效期内的`key`值，你可以根据配置参数来筛选这些`keys`，它会以一个数组的形式返回给你
 ```js
 // 参数类型
 conditions: object  ===> 可选参数
@@ -366,7 +370,8 @@ gLocal.allKey({prefix:'java',linkSign:'.',suffix:'script'}) // ===> return ['jav
 
 
 
-- clearFun (conditions?)
+#### 3.6、  clearFun (conditions?)
+简要说明：该方法就是用来清除浏览器所有在有效期内的`key`值对应的缓存，你可以根据配置参数来筛选你要清除的缓存，该方法无返回值。
 
 ```js
 // 参数类型
@@ -397,10 +402,11 @@ conditions: {
 	// 2.7 如果传了prefix、suffix，则条件为【前缀===prefix && 后缀===suffix && 连接符号===linkSign(默认值)】
 
 	// 2.8 如果传了prefix、suffix、linkSign，则条件为【前缀===prefix && 后缀===suffix && 连接符号===linkSign】
-
+	
 ```
 
-
+<hr>
+<br/>
 
 ## 三、一些注意事项
 
